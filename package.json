@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "express": "latest",
+    "connect-redis" : "latest",
     "hiredis": "latest",
     "redis": "latest",
     "oauth": "latest"
