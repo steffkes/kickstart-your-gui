@@ -111,7 +111,7 @@ app.get
         console.log( 'oauth_token_secret: ' + oauth_token_secret );
 
         // redirect the user to authorize the token
-        response.redirect( 'https://api.twitter.com/oauth/authorize?oauth_token=' + oauth_token );
+        response.redirect( 'https://api.twitter.com/oauth/authenticate?oauth_token=' + oauth_token );
 	  
       }
 
