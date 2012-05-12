@@ -6,6 +6,7 @@
     "npm":  "1.1.x"
   },
   "dependencies": {
-    "express": "2.5.9"
+    "express": "2.5.9",
+    "redis-url": "0.1.0"
   }
 }
