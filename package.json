@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "express": "2.5.9",
-    "redis-url": "0.1.0"
+    "hiredis": "latest",
+    "redis": "latest"
   }
 }
