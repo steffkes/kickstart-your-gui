@@ -10,5 +10,8 @@
     "hiredis": "latest",
     "redis": "latest",
     "oauth": "latest"
+  },
+  "scripts": {
+    "start": "foreman start"
   }
 }
