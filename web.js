@@ -8,7 +8,7 @@ var app = express.createServer();
 app.use( express.logger() );
 app.use( express.bodyParser() );
 app.use( express.cookieParser() );
-app.use( express.session( { secret: "MC44NzA2OTIwMCAxMzM2ODM5MDY1IzRmYWU4Yjk5ZDQ5NzM" } ) );
+app.use( express.session( { key: 'session_id', secret: "MC44NzA2OTIwMCAxMzM2ODM5MDY1IzRmYWU4Yjk5ZDQ5NzM" } ) );
 
 app.configure
 (
