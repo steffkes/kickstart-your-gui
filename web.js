@@ -256,14 +256,33 @@ app.post
 
         } else {
 
-          redis.multi()
-               .incr( 'projects:score:' + project_id )
-               .exec( function( err, result ) {
+          var user_vote_key = 'users:' + request.session.twitter.screen_name + ':votes';
 
-                 console.log( result );
-                 response.send( 'OK', 201 );
+          redis.sismember
+          (
+            user_vote_key, project_id,
+            function( err, result ) {
 
-               } );
+              if( result ) {
+
+                response.send( 'Already voted for "' + project_id + '", sorry.', 423 );
+
+              } else {
+
+                redis.multi()
+                     .incr( 'projects:score:' + project_id )
+                     .sadd( user_vote_key, project_id )
+                     .exec( function( err, result ) {
+
+                       console.log( result );
+                       response.send( 'OK', 201 );
+
+                     } );
+
+              }
+
+            }
+          );
 
         }
 
