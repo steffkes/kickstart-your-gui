@@ -79,6 +79,12 @@ app.configure
   }
 );
 
+app.dynamicHelpers({
+  twitter: function( request, response ) {
+    return request.session.twitter || null;
+  }
+});
+
 app.get
 (
   '/',

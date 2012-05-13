@@ -11,6 +11,12 @@
 
     <h1>Kickstart your GUI</h1>
 
+    <% if( twitter ) { %>
+
+      <p>Logged in as <strong><%= twitter.screen_name %></strong></p>
+
+    <% } %>
+
     <%- body %>
 
     <script src="/scripts/main.js"></script>
