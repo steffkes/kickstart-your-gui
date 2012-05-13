@@ -238,6 +238,41 @@ app.get
   }
 );
 
+app.post
+(
+  '/my/:project_id',
+  function( request, response ) {
+
+    var project_id = request.params.project_id;
+
+    redis.sismember
+    (
+      'projects:list', project_id,
+      function( err, result ) {
+
+        if( !result ) {
+
+          response.send( 'Sorry, we have no Project "' + project_id + '"?', 404 );
+
+        } else {
+
+          redis.multi()
+               .incr( 'projects:score:' + project_id )
+               .exec( function( err, result ) {
+
+                 console.log( result );
+                 response.send( 'OK', 201 );
+
+               } );
+
+        }
+
+      }
+    );
+
+  }
+);
+
 app.listen
 (
   process.env.PORT,
