@@ -49,10 +49,23 @@ redis.on
 // -- expressjs
 
 var app = express.createServer();
-app.use( express.logger() );
-app.use( express.bodyParser() );
-app.use( express.cookieParser() );
-app.use( express.session( { key: 'session_id', secret: "MC44NzA2OTIwMCAxMzM2ODM5MDY1IzRmYWU4Yjk5ZDQ5NzM", store: new RedisStore( { client : redis } ) } ) );
+
+app.configure
+(
+  function(){
+
+    app.set( 'view engine', 'ejs' );
+    app.set( 'views', __dirname + '/views' );
+    app.use( express.logger() );
+    app.use( express.bodyParser() );
+    app.use( express.methodOverride() );
+    app.use( express.cookieParser() );
+    app.use( express.session( { key: 'session_id', secret: "MC44NzA2OTIwMCAxMzM2ODM5MDY1IzRmYWU4Yjk5ZDQ5NzM", store: new RedisStore( { client : redis } ) } ) );
+    app.use( express.static( __dirname + '/public' ) );
+    app.use( express.errorHandler() );
+
+  }
+);
 
 app.configure
 (
@@ -60,6 +73,8 @@ app.configure
   function() {
 
     process.env.PORT = 5000;
+
+    app.use( express.errorHandler( { dumpExceptions: true, showStack: true } ) );
 
   }
 );
@@ -69,14 +84,30 @@ app.get
   '/',
   function( request, response ) {
 
-    if( request.session.twitter_data && request.session.twitter_data.screen_name )
-    {
-      response.send( 'Heya ' + request.session.twitter_data.screen_name + ' =)' );
-    }
-    else
-    {
-      response.send( 'You\'re not logged in - <a href="/auth">go and do so</a>' );
-    }
+    redis.sort
+    (
+      'projects:list', 'DESC', 'BY', 'projects:score:*', 'GET', 'projects:score:*', 'GET', 'projects:data:*',
+      function( err, result ) {
+
+        var projects = [];
+        var result_count = result.length;
+
+        for( var i = 1; i < result_count; i += 2 )
+        {
+          var project = JSON.parse( result[i] );
+          project._score = parseInt( result[i-1] ) || null;
+
+          projects.push( project );
+        }
+
+        response.render
+        (
+          'index',
+          { projects: projects }
+        );
+
+      }
+    );
 
   }
 );
@@ -106,14 +137,10 @@ app.get
    
       } else {
  
-        // store the tokens in the session
         request.session.oa = oa;
         request.session.oauth_token = oauth_token;
         request.session.oauth_token_secret = oauth_token_secret;
-        console.log( 'oauth_token: ' + oauth_token );
-        console.log( 'oauth_token_secret: ' + oauth_token_secret );
 
-        // redirect the user to authorize the token
         response.redirect( 'https://api.twitter.com/oauth/authenticate?oauth_token=' + oauth_token );
 	  
       }
@@ -155,13 +182,10 @@ app.get
 
         } else {
 
-          // store the access token in the session
           request.session.oauth_access_token = oauth_access_token;
           request.session.oauth_access_token_secret = oauth_access_token_secret;
-          console.log( 'oauth_access_token: ' + oauth_access_token );
-          console.log( 'oauth_access_token_secret: ' + oauth_access_token_secret );
 
-          request.session.twitter_data = results;
+          request.session.twitter = results;
 
           response.redirect( '/' );
         }

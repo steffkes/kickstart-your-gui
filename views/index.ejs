@@ -1,0 +1,27 @@
+<% if( !projects.length ) { %>
+
+  <p>Sorry, no Projects are willing to kickstart their GUI :/</p>
+
+<% } else { %>
+
+  <ul>
+    <% projects.forEach( function( project ) { %>
+
+      <li>
+
+        <h2>
+          <%= project.name %>
+
+          <% if( project._score ) { %>
+            <strong><%= project._score %>*</strong>
+          <% } %>
+        </h2>
+
+        <p><%= project.description %></p>
+
+      </li>
+
+    <% }) %>
+  </ul>
+
+<% } %>
