@@ -1,0 +1,34 @@
+!!! 5
+html
+
+  head
+
+    title Kickstart your GUI
+
+    link( href="/styles/screen.css", rel="stylesheet", type="text/css" )
+
+  body
+
+    h1 Kickstart your GUI
+
+    if twitter
+
+      p
+        | Hello 
+        strong= twitter.screen_name
+        | =)
+      
+      form( action="/auth", method="post" )
+
+        input( type="hidden", name="_method", value="delete" )
+        button( type="submit" ) Logout
+
+    else
+
+      p
+        a( href="/auth" ) Login
+        |  is required for suggesting new Projects an vote on existing ones
+
+    block content
+
+    script( href="/scripts/main.js" )

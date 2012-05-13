@@ -1,0 +1,50 @@
+extends layout
+
+block content
+
+  if !projects.length
+
+    p Sorry, no Projects are willing to kickstart their GUI :/
+
+  else
+
+    ul
+      each project in projects
+
+        li
+
+          h2
+            | #{project.name} 
+
+            if project._score
+              strong #{project._score}*
+
+          p= project.description
+
+          if twitter
+
+            form( action="/my/" + project.id, method="post" )
+
+              if project._voted
+
+                input( type="hidden", name="_method", value="delete" )
+                button( type="submit" ) Uhm, no :/
+
+              else
+
+                button( type="submit" ) Arr, Yes!!
+
+  if twitter
+
+    form( action="/", method="post" )
+
+      p
+        label( for="project_name" ) Name:
+        input( type="text", name="project[name]", id="project_name", placeholder="What's the Name of your Project?" )
+
+      p
+        label( for="project_description" ) Description:
+        input( type="text", name="project[description]", id="project_description", placeholder="Describe your Project with a few words ..." )
+
+      p
+        button( type="submit" ) Kickstart

@@ -11,7 +11,7 @@
     "hiredis": "latest",
     "redis": "latest",
     "oauth": "latest",
-    "ejs": "latest"
+    "jade": "latest"
   },
   "scripts": {
     "start": "foreman start"

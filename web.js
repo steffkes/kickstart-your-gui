@@ -54,7 +54,8 @@ app.configure
 (
   function(){
 
-    app.set( 'view engine', 'ejs' );
+    app.set( 'view engine', 'jade' );
+    app.set( 'view options', { layout: false } );
     app.set( 'views', __dirname + '/views' );
     app.use( express.logger() );
     app.use( express.bodyParser() );
