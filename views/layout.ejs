@@ -13,7 +13,17 @@
 
     <% if( twitter ) { %>
 
-      <p>Logged in as <strong><%= twitter.screen_name %></strong></p>
+      <p>Hello <strong><%= twitter.screen_name %></strong> =)</p>
+      <form action="/auth" method="post">
+
+        <input type="hidden" name="_method" value="delete">
+        <button type="submit">Logout</button>
+
+      </form>
+
+    <% } else { %>
+
+      <p><a href="/auth">Login</a> is required for suggesting new Projects an vote on existing ones</p>
 
     <% } %>
 

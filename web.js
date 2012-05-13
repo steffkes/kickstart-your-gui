@@ -215,6 +215,17 @@ app.get
   }
 );
 
+app.delete
+(
+  '/auth',
+  function( request, response ) {
+
+    request.session.destroy();
+    response.redirect( '/' );
+
+  }
+);
+
 app.get
 (
   '/auth/callback',
