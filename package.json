@@ -10,7 +10,8 @@
     "connect-redis" : "latest",
     "hiredis": "latest",
     "redis": "latest",
-    "oauth": "latest"
+    "oauth": "latest",
+    "ejs": "latest"
   },
   "scripts": {
     "start": "foreman start"
