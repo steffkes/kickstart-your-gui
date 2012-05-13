@@ -112,6 +112,48 @@ app.get
   }
 );
 
+app.post
+(
+  '/',
+  function( request, response ) {
+
+    var project = request.body.project;
+    project.id = project.name.toLowerCase().replace( /[^\w\d-]/g, '-' ).replace( /-+/g, '-' );
+    project.created_at = new Date();
+    project.created_by = request.session.twitter.screen_name;
+
+    console.log( project );
+
+    redis.sismember
+    (
+      'projects:list', project.id,
+      function( err, result ) {
+
+        if( 1 === result ) {
+
+          response.send( 'Sorry, we already have a Project named "' + project.name + '" - please check that first', 409 );        
+
+        } else {
+
+          redis.multi()
+               .sadd( 'projects:list', project.id )
+               .set( 'projects:score:' + project.id, 0 )
+               .set( 'projects:data:' + project.id, JSON.stringify( project ) )
+               .exec( function( err, result ) {
+
+                 console.log( result );
+                 response.redirect( '/' );
+
+               } );
+
+        }
+
+      }
+    );
+
+  }
+);
+
 app.get
 (
   '/auth',
