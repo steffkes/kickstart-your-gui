@@ -165,7 +165,15 @@ app.post
                .exec( function( err, result ) {
 
                  console.log( result );
-                 response.redirect( '/' );
+                 if( request.xhr ) {
+
+                   response.send( 'OK', 201 );
+
+                 } else {
+
+                   response.redirect( '/' );
+
+                 }
 
                } );
 
@@ -309,7 +317,15 @@ app.post
                      .exec( function( err, result ) {
 
                        console.log( result );
-                       response.send( 'OK', 201 );
+                       if( request.xhr ) {
+
+                         response.send( 'OK', 201 );
+
+                       } else {
+
+                         response.redirect( '/' );
+
+                       }
 
                      } );
 
@@ -363,7 +379,15 @@ app.delete
                      .exec( function( err, result ) {
 
                        console.log( result );
-                       response.send( 'OK', 200 );
+                       if( request.xhr ) {
+
+                         response.send( 'OK', 200 );
+
+                       } else {
+
+                         response.redirect( '/' );
+
+                       }
 
                      } );
 
