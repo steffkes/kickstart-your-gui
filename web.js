@@ -84,39 +84,47 @@ app.get
   '/',
   function( request, response ) {
 
-    redis.smembers
-    (
-      'users:' + request.session.twitter.screen_name + ':votes',
-      function( err, user_votes ) {
+    var callback = function( err, user_votes )
+    {
+      redis.sort
+      (
+        'projects:list', 'DESC', 'BY', 'projects:score:*', 'GET', 'projects:score:*', 'GET', 'projects:data:*',
+        function( err, result ) {
 
-        redis.sort
-        (
-          'projects:list', 'DESC', 'BY', 'projects:score:*', 'GET', 'projects:score:*', 'GET', 'projects:data:*',
-          function( err, result ) {
+          var projects = [];
+          var result_count = result.length;
 
-            var projects = [];
-            var result_count = result.length;
+          for( var i = 1; i < result_count; i += 2 )
+          {
+            var project = JSON.parse( result[i] );
+            project._score = parseInt( result[i-1] ) || null;
+            project._voted = -1 !== user_votes.indexOf( project.id );
 
-            for( var i = 1; i < result_count; i += 2 )
-            {
-              var project = JSON.parse( result[i] );
-              project._score = parseInt( result[i-1] ) || null;
-              project._voted = -1 !== user_votes.indexOf( project.id );
-
-              projects.push( project );
-            }
-
-            response.render
-            (
-              'index',
-              { projects: projects }
-            );
-
+            projects.push( project );
           }
-        );
 
-      }
-    );
+          response.render
+          (
+            'index',
+            { projects: projects }
+          );
+
+        }
+      );
+    }
+
+    if( request.session.twitter )
+    {
+      redis.smembers
+      (
+        'users:' + request.session.twitter.screen_name + ':votes',
+        callback
+      );
+    }
+    else
+    {
+      callback( null, [] );
+    }
 
   }
 );
