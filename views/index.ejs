@@ -20,7 +20,12 @@
         <p><%= project.description %></p>
 
         <form action="/my/<%= project.id %>" method="post">
-          <button type="submit">Vote!</button>
+          <% if( project._voted ) { %>
+            <input type="hidden" name="_method" value="delete">
+            <button type="submit">Reject my Vote</button>
+          <% } else { %>
+            <button type="submit">Vote!</button>
+          <% } %>
         </form>
 
       </li>

@@ -84,26 +84,35 @@ app.get
   '/',
   function( request, response ) {
 
-    redis.sort
+    redis.smembers
     (
-      'projects:list', 'DESC', 'BY', 'projects:score:*', 'GET', 'projects:score:*', 'GET', 'projects:data:*',
-      function( err, result ) {
+      'users:' + request.session.twitter.screen_name + ':votes',
+      function( err, user_votes ) {
 
-        var projects = [];
-        var result_count = result.length;
-
-        for( var i = 1; i < result_count; i += 2 )
-        {
-          var project = JSON.parse( result[i] );
-          project._score = parseInt( result[i-1] ) || null;
-
-          projects.push( project );
-        }
-
-        response.render
+        redis.sort
         (
-          'index',
-          { projects: projects }
+          'projects:list', 'DESC', 'BY', 'projects:score:*', 'GET', 'projects:score:*', 'GET', 'projects:data:*',
+          function( err, result ) {
+
+            var projects = [];
+            var result_count = result.length;
+
+            for( var i = 1; i < result_count; i += 2 )
+            {
+              var project = JSON.parse( result[i] );
+              project._score = parseInt( result[i-1] ) || null;
+              project._voted = -1 !== user_votes.indexOf( project.id );
+
+              projects.push( project );
+            }
+
+            response.render
+            (
+              'index',
+              { projects: projects }
+            );
+
+          }
         );
 
       }
@@ -276,6 +285,60 @@ app.post
 
                        console.log( result );
                        response.send( 'OK', 201 );
+
+                     } );
+
+              }
+
+            }
+          );
+
+        }
+
+      }
+    );
+
+  }
+);
+
+app.delete
+(
+  '/my/:project_id',
+  function( request, response ) {
+
+    var project_id = request.params.project_id;
+
+    redis.sismember
+    (
+      'projects:list', project_id,
+      function( err, result ) {
+
+        if( !result ) {
+
+          response.send( 'Sorry, we have no Project "' + project_id + '"?', 404 );
+
+        } else {
+
+          var user_vote_key = 'users:' + request.session.twitter.screen_name + ':votes';
+
+          redis.sismember
+          (
+            user_vote_key, project_id,
+            function( err, result ) {
+
+              if( !result ) {
+
+                response.send( 'There is no vote for you on "' + project_id + '", sorry.', 404 );
+
+              } else {
+
+                redis.multi()
+                     .decr( 'projects:score:' + project_id )
+                     .srem( user_vote_key, project_id )
+                     .exec( function( err, result ) {
+
+                       console.log( result );
+                       response.send( 'OK', 200 );
 
                      } );
 
