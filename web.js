@@ -82,8 +82,8 @@ app.configure
 );
 
 app.dynamicHelpers({
-  twitter: function( request, response ) {
-    return request.session.twitter || null;
+  user: function( request, response ) {
+    return request.session.user || null;
   }
 });
 
@@ -259,8 +259,6 @@ app.get
       request.param( 'oauth_verifier' ), 
       function( err, oauth_access_token, oauth_access_token_secret, results ) {
 
-        console.log( 'results: ', results );
-
         if( err ) {
 
           console.log( err );
@@ -271,7 +269,10 @@ app.get
           request.session.oauth_access_token = oauth_access_token;
           request.session.oauth_access_token_secret = oauth_access_token_secret;
 
-          request.session.twitter = results;
+          request.session.user = {
+            ident : 'twitter_' + results.user_id,
+            name : results.screen_name
+          };
 
           response.redirect( '/' );
         }
@@ -338,7 +339,11 @@ app.get
           access_token,
           function( err, results ) {
 
-            request.session.google = JSON.parse( results );
+            results = JSON.parse( results );
+            request.session.user = {
+              ident : 'google_' + results.id,
+              name : results.given_name || results.name
+            };
             response.redirect( '/' );
 
           }
@@ -368,7 +373,7 @@ app.post
 
         } else {
 
-          var user_vote_key = 'users:' + request.session.twitter.screen_name + ':votes';
+          var user_vote_key = 'users:' + request.session.user.ident + ':votes';
 
           redis.sismember
           (
@@ -430,7 +435,7 @@ app.delete
 
         } else {
 
-          var user_vote_key = 'users:' + request.session.twitter.screen_name + ':votes';
+          var user_vote_key = 'users:' + request.session.user.ident + ':votes';
 
           redis.sismember
           (

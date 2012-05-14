@@ -21,7 +21,7 @@ block content
 
           p= project.description
 
-          if twitter
+          if user
 
             form( action="/my/" + project.id, method="post" )
 
@@ -34,7 +34,7 @@ block content
 
                 button( type="submit" ) Arr, Yes!!
 
-  if twitter
+  if user
 
     form( action="/", method="post" )
 

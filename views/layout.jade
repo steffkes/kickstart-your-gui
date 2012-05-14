@@ -11,11 +11,11 @@ html
 
     h1 Kickstart your GUI
 
-    if twitter
+    if user
 
       p
         | Hello 
-        strong= twitter.screen_name
+        strong= user.name
         |  =)
       
       form( action="/auth", method="post" )
