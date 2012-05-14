@@ -280,6 +280,7 @@ app.get
           request.session.oauth_access_token_secret = oauth_access_token_secret;
 
           request.session.user = {
+            type : 'twitter',
             ident : 'twitter_' + results.user_id,
             name : results.screen_name
           };
@@ -351,6 +352,7 @@ app.get
 
             results = JSON.parse( results );
             request.session.user = {
+              type : 'google',
               ident : 'google_' + results.id,
               name : results.given_name || results.name
             };
