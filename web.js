@@ -121,11 +121,11 @@ app.get
       );
     }
 
-    if( request.session.twitter )
+    if( request.session.user )
     {
       redis.smembers
       (
-        'users:' + request.session.twitter.screen_name + ':votes',
+        'users:' + request.session.user.ident + ':votes',
         callback
       );
     }
@@ -145,7 +145,6 @@ app.post
     var project = request.body.project;
     project.id = project.name.toLowerCase().replace( /[^\w\d-]/g, '-' ).replace( /-+/g, '-' );
     project.created_at = new Date();
-    project.created_by = request.session.twitter.screen_name;
 
     console.log( project );
 
