@@ -192,6 +192,27 @@ app.get
   '/auth',
   function( request, response ) {
 
+    response.send( 'Use <a href="/auth/twitter">Twitter</a> or <a href="/auth/google">Google</a>, thanks' );
+
+  }
+);
+
+app.delete
+(
+  '/auth',
+  function( request, response ) {
+
+    request.session.destroy();
+    response.redirect( '/' );
+
+  }
+);
+
+app.get
+(
+  '/auth/twitter',
+  function( request, response ) {
+
     var oa = new oauth
     (
       'https://api.twitter.com/oauth/request_token',
@@ -199,7 +220,7 @@ app.get
       'pD4hi0wMlrfVO35SCve4HA',
       'qRm5x4wTrzYEaSKkgmBr6lpnbDhzxTCu8EjrprknE',
       '1.0',
-      'http://' + request.headers.host + '/auth/callback',
+      'http://' + request.headers.host + '/auth/twitter/callback',
       'HMAC-SHA1'
     );
 
@@ -225,20 +246,9 @@ app.get
   }
 );
 
-app.delete
-(
-  '/auth',
-  function( request, response ) {
-
-    request.session.destroy();
-    response.redirect( '/' );
-
-  }
-);
-
 app.get
 (
-  '/auth/callback',
+  '/auth/twitter/callback',
   function( request, response ) {
 
     var oa = new oauth
