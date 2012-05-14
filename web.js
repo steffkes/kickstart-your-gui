@@ -1,6 +1,7 @@
 var express = require('express');
 var url = require('url');
 var oauth = require('oauth').OAuth;
+var oauth2 = require('oauth').OAuth2;
 var redis_lib = require('redis');
 var RedisStore = require('connect-redis')(express);
 
@@ -274,6 +275,74 @@ app.get
 
           response.redirect( '/' );
         }
+
+      }
+    );
+
+  }
+);
+
+app.get
+(
+  '/auth/google',
+  function( request, response ) {
+
+    var oa = new oauth2(
+      '197270800263.apps.googleusercontent.com',
+      '7CHf6dUG76kp1FUMLf2RdDMe',
+      'https://accounts.google.com',
+      '/o/oauth2/auth',
+      '/o/oauth2/token'
+    );
+
+    var redirect_url = oa.getAuthorizeUrl({
+      response_type : 'code',
+      redirect_uri : 'http://' + request.headers.host + '/auth/google/callback',
+      scope : [ 'https://www.googleapis.com/auth/userinfo.profile' ],
+    });
+
+    request.session.oa = oa;
+    response.redirect( redirect_url );
+
+  }
+);
+
+app.get
+(
+  '/auth/google/callback',
+  function( request, response ) {
+
+    var oa = new oauth2(
+      request.session.oa._clientId,
+      request.session.oa._clientSecret,
+      request.session.oa._baseSite,
+      request.session.oa._authorizeUrl,
+      request.session.oa._accessTokenUrl
+    );
+
+    var parsed_url= url.parse( request.originalUrl, true );
+
+    oa.getOAuthAccessToken(
+      parsed_url.query.code,
+      {
+        redirect_uri: 'http://' + request.headers.host + '/auth/google/callback',
+        grant_type: 'authorization_code'
+      },
+      function( err, access_token, refresh_token, results ) {
+
+        console.log( access_token );
+        request.session.oauth_access_token = access_token;
+
+        oa.get(
+          'https://www.googleapis.com/oauth2/v1/userinfo',
+          access_token,
+          function( err, results ) {
+
+            request.session.google = JSON.parse( results );
+            response.redirect( '/' );
+
+          }
+        );
 
       }
     );
