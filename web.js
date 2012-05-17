@@ -191,7 +191,7 @@ app.get
   '/auth',
   function( request, response ) {
 
-    response.send( 'Use <a href="/auth/twitter">Twitter</a> or <a href="/auth/google">Google</a>, thanks' );
+    response.send( 'Use <a href="/auth/twitter">Twitter</a>, <a href="/auth/github">GitHub</a> or <a href="/auth/google">Google</a>, thanks' );
 
   }
 );
@@ -363,6 +363,75 @@ app.get
       }
     );
 
+  }
+);
+
+app.get
+(
+  '/auth/github',
+  function( request, response ) {
+
+    var oa = new oauth2(
+      'dc924182dfc6561652f3',
+      '28240306ad22b08ac321cc9034e5623e240a3e05',
+      'https://github.com',
+      '/login/oauth/authorize',
+      '/login/oauth/access_token'
+    );
+
+    var redirect_url = oa.getAuthorizeUrl({
+      redirect_uri : 'http://' + request.headers.host + '/auth/github/callback',
+      scope : [],
+    });
+
+    request.session.oa = oa;
+    response.redirect( redirect_url );
+
+  }
+);
+
+app.get
+(
+  '/auth/github/callback',
+  function( request, response ) {
+
+    var oa = new oauth2(
+      request.session.oa._clientId,
+      request.session.oa._clientSecret,
+      request.session.oa._baseSite,
+      request.session.oa._authorizeUrl,
+      request.session.oa._accessTokenUrl
+    );
+
+    var parsed_url = url.parse( request.originalUrl, true );
+
+    oa.getOAuthAccessToken(
+      parsed_url.query.code,
+      {},
+      function( err, access_token, refresh_token, results ) {
+
+        console.log( access_token );
+        request.session.oauth_access_token = access_token;
+
+        oa.get(
+          'https://api.github.com/user',
+          access_token,
+          function( err, results ) {
+
+            results = JSON.parse( results );
+            request.session.user = {
+              type : 'github',
+              ident : 'github_' + results.id,
+              name : results.login
+            };
+            response.redirect( '/' );
+
+
+          }
+        );
+
+      }
+    );
   }
 );
 
