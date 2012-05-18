@@ -14,7 +14,12 @@ block content
         li
 
           h2
-            | #{project.name} 
+
+            if project.url
+              a( href=project.url )= project.name
+
+            else
+              #{project.name}
 
             if project._score
               strong #{project._score}*
@@ -22,8 +27,19 @@ block content
           p= project.description
 
           if project.picture
-
             img( src="http://src.sencha.io/100/100/" + project.picture )
+
+          if project.references
+
+            dl
+
+              each description, url in project.references
+
+                dt
+                  a( href=url )= url
+
+                if description
+                  dd= description
 
           if user
 
@@ -46,6 +62,11 @@ block content
         label( for="project_name" ) Name:
         input( type="text", name="project[name]", id="project_name", placeholder="What's the Name of your Project?" )
 
+
+      p
+        label( for="project_url" ) Url:
+        input( type="text", name="project[url]", id="project_url", placeholder="Where can others find your Project?" )
+
       p
         label( for="project_description" ) Description:
         input( type="text", name="project[description]", id="project_description", placeholder="Describe your Project with a few words ..." )
@@ -53,6 +74,35 @@ block content
       p
         label( for="project_picture" ) Picture:
         input( type="text", name="project[picture]", id="project_picture", placeholder="Path to a Picture, Screenshot or Logo?" )
+
+      p References
+
+      dl
+
+        dt
+          input( type="text", name="project[references][0][url]", placeholder="http://host.tld/path/to/project/description" )
+        dd
+          input( type="text", name="project[references][0][desc]", placeholder="Additional Description" )
+
+        dt 
+          input( type="text", name="project[references][1][url]" )
+        dd
+          input( type="text", name="project[references][1][desc]" )
+
+        dt 
+          input( type="text", name="project[references][2][url]" )
+        dd
+          input( type="text", name="project[references][2][desc]" )
+
+        dt 
+          input( type="text", name="project[references][3][url]" )
+        dd
+          input( type="text", name="project[references][3][desc]" )
+
+        dt 
+          input( type="text", name="project[references][4][url]" )
+        dd
+          input( type="text", name="project[references][4][desc]" )
 
       p
         button( type="submit" ) Kickstart

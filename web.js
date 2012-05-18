@@ -146,6 +146,20 @@ app.post
     project.id = project.name.toLowerCase().replace( /[^\w\d-]/g, '-' ).replace( /-+/g, '-' );
     project.created_at = new Date();
 
+    // -- references
+
+    var references = project.references;
+    var references_count = references.length;
+
+    project.references = {};
+    for( var i = 0; i < references_count; i++ )
+    {
+      project.references[ references[i].url ] = references[i].desc || null;
+    }
+    delete project.references[''];
+
+    // --
+
     console.log( project );
 
     redis.sismember
