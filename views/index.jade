@@ -21,6 +21,10 @@ block content
 
           p= project.description
 
+          if project.picture
+
+            img( src="http://src.sencha.io/100/100/" + project.picture )
+
           if user
 
             form( action="/my/" + project.id, method="post" )
@@ -45,6 +49,10 @@ block content
       p
         label( for="project_description" ) Description:
         input( type="text", name="project[description]", id="project_description", placeholder="Describe your Project with a few words ..." )
+
+      p
+        label( for="project_picture" ) Picture:
+        input( type="text", name="project[picture]", id="project_picture", placeholder="Path to a Picture, Screenshot or Logo?" )
 
       p
         button( type="submit" ) Kickstart
