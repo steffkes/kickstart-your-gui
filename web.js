@@ -5,6 +5,19 @@ var oauth2 = require('oauth').OAuth2;
 var redis_lib = require('redis');
 var RedisStore = require('connect-redis')(express);
 
+var project_options = {
+
+  languages : {
+    java : 'Java',
+    python : 'Python'
+  },
+  buildsystems : {
+    ant : 'Ant',
+    maven : 'Maven'
+  }
+
+};
+
 // -- redis
 
 var redis_url  = url.parse( process.env.REDISTOGO_URL || 'redis://0:secret@localhost:9104/' );
@@ -81,11 +94,19 @@ app.configure
   }
 );
 
-app.dynamicHelpers({
-  user: function( request, response ) {
-    return request.session.user || null;
+app.dynamicHelpers
+(
+  {
+    user: function( request, response )
+    {
+      return request.session.user || null;
+    },
+    project_options : function( request, response )
+    {
+      return project_options;
+    }
   }
-});
+);
 
 app.get
 (
@@ -145,6 +166,41 @@ app.post
     var project = request.body.project;
     project.id = project.name.toLowerCase().replace( /[^\w\d-]/g, '-' ).replace( /-+/g, '-' );
     project.created_at = new Date();
+
+    // -- languages
+
+    if( project.languages )
+    {
+      project.languages = project.languages.filter
+      (
+        function( element, index, array )
+        {
+          return 'undefined' !== typeof project_options.languages[element];
+        }
+      );
+
+      if( 0 === project.languages.length )
+      {
+        delete project.languages;
+      }
+    }
+
+    // -- buildsystems
+
+    if( project.buildsystems )
+    {
+      project.buildsystems = project.buildsystems.filter
+      (
+        function( element, index, array ) 
+        {
+          return 'undefined' !== typeof project_options.buildsystems[element];
+        } 
+      );
+      if( 0 === project.buildsystems.length )
+      {
+        delete project.buildsystems;
+      }
+    }
 
     // -- references
 

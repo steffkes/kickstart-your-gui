@@ -29,6 +29,18 @@ block content
           if project.picture
             img( src="http://src.sencha.io/100/100/" + project.picture )
 
+          if project.languages
+            p Languages:
+            ul
+              each language in project.languages
+                li= project_options.languages[language]
+
+          if project.buildsystems
+            p Build-Systems:
+            ul
+              each buildsystem in project.buildsystems
+                li= project_options.buildsystems[buildsystem]
+
           if project.references
 
             dl
@@ -74,6 +86,28 @@ block content
       p
         label( for="project_picture" ) Picture:
         input( type="text", name="project[picture]", id="project_picture", placeholder="Path to a Picture, Screenshot or Logo?" )
+
+      p
+        span Used Languages:
+        ul
+
+          each language, key in project_options.languages
+
+            li
+              label( for="project_language_" + key )
+                input( type="checkbox", name="project[languages][]", value=key )
+                span= language
+
+      p
+        span Used Buildsystems:
+        ul
+
+          each buildsystem, key in project_options.buildsystems
+
+            li
+              label( for="project_buildsystem_" + key )
+                input( type="checkbox", name="project[buildsystems][]", value=key )
+                span= buildsystem
 
       p References
 
