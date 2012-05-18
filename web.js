@@ -191,7 +191,7 @@ app.get
   '/auth',
   function( request, response ) {
 
-    response.send( 'Use <a href="/auth/twitter">Twitter</a>, <a href="/auth/github">GitHub</a> or <a href="/auth/google">Google</a>, thanks' );
+    response.send( 'Use <a href="/auth/twitter">Twitter</a>, <a href="/auth/github">GitHub</a>, <a href="/auth/linkedin">LinkedIn</a> or <a href="/auth/google">Google</a>, thanks' );
 
   }
 );
@@ -285,6 +285,105 @@ app.get
           };
 
           response.redirect( '/' );
+        }
+
+      }
+    );
+
+  }
+);
+
+
+app.get
+(
+  '/auth/linkedin',
+  function( request, response ) {
+
+    var oa = new oauth
+    (
+      'https://api.linkedin.com/uas/oauth/requestToken',
+      'https://api.linkedin.com/uas/oauth/accessToken',
+      'xepy4uorsk03',
+      'nt2P9iM09ZHs1yJ6',
+      '1.0',
+      'http://' + request.headers.host + '/auth/linkedin/callback',
+      'HMAC-SHA1'
+    );
+
+    oa.getOAuthRequestToken( function( err, oauth_token, oauth_token_secret, results ) {
+
+      if( err ) {
+
+        console.log( err );
+        response.send( err );
+
+      } else {
+
+        request.session.oa = oa;
+        request.session.oauth_token = oauth_token;
+        request.session.oauth_token_secret = oauth_token_secret;
+
+        response.redirect( 'https://www.linkedin.com/uas/oauth/authenticate?oauth_token=' + oauth_token );
+
+      }
+
+    });
+
+  }
+);
+
+app.get
+(
+  '/auth/linkedin/callback',
+  function( request, response ) {
+
+    var oa = new oauth
+    (
+      request.session.oa._requestUrl,
+      request.session.oa._accessUrl,
+      request.session.oa._consumerKey,
+      request.session.oa._consumerSecret,
+      request.session.oa._version,
+      request.session.oa._authorize_callback,
+      request.session.oa._signatureMethod
+    );
+
+    oa.getOAuthAccessToken
+    (
+      request.session.oauth_token,
+      request.session.oauth_token_secret,
+      request.param( 'oauth_verifier' ),
+      function( err, oauth_access_token, oauth_access_token_secret, results ) {
+
+        if( err ) {
+
+          console.log( err );
+          response.send( err );
+
+        } else {
+
+          request.session.oauth_access_token = oauth_access_token;
+          request.session.oauth_access_token_secret = oauth_access_token_secret;
+
+          oa.get(
+            'http://api.linkedin.com/v1/people/~:(id,first-name)?format=json',
+            oauth_access_token,
+            oauth_access_token_secret,
+            function( err, results ) {
+
+              results = JSON.parse( results );
+
+              request.session.user = {
+                type : 'linkedin',
+                ident : 'linkedin_' + results.id,
+                name : results.firstName
+              };
+
+              response.redirect( '/' );
+
+            }
+          );
+
         }
 
       }
