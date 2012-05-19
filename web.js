@@ -272,6 +272,7 @@ app.put
         if( !result )
         {
           response.send( 'Sorry, we have no Project "' + project_id + '"?', 404 );
+          return false;
         }
 
         redis.get
@@ -280,6 +281,13 @@ app.put
           function( err, project )
           {
             project = JSON.parse( project );
+
+            if( project.created_by !== request.session.user.ident )
+            {
+              response.send( 'Dude, that\'s not your Project?', 401 );
+              return false;
+            }
+
             project.wip = !!parseInt( request.body.wip, 10 );
 
             redis.set
