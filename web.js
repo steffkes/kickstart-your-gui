@@ -166,6 +166,7 @@ app.post
     var project = request.body.project;
     project.id = project.name.toLowerCase().replace( /[^\w\d-]/g, '-' ).replace( /-+/g, '-' );
     project.created_at = new Date();
+    project.created_by = request.session.user.ident;
 
     // -- languages
 
