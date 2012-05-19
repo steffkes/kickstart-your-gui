@@ -132,6 +132,14 @@ app.get
             projects.push( project );
           }
 
+          projects.sort
+          (
+            function( first, second )
+            {
+              return first.wip && true === first.wip;
+            }
+          );
+
           response.render
           (
             'index',
