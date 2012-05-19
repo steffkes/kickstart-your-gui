@@ -136,7 +136,9 @@ app.get
           (
             function( first, second )
             {
-              return first.wip && true === first.wip;
+              if( first.wip && !second.wip ) return 1;
+              if( first.wip && second.wip ) return 0;
+              return -1;
             }
           );
 
