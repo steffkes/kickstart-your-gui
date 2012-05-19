@@ -15,6 +15,9 @@ block content
 
           h2
 
+            if project.wip 
+              span [WIP] 
+
             if project.url
               a( href=project.url )= project.name
 
@@ -66,6 +69,22 @@ block content
               else
 
                 button( type="submit" ) Arr, Yes!!
+
+          if user && user.ident === project.created_by
+
+            form( action=project.id, method="post" )
+
+              input( type="hidden", name="_method", value="put" )
+
+              if project.wip
+
+                input( type="hidden", name="wip", value="0" )
+                button( type="submit" ) We're still looking!
+
+              else
+
+                input( type="hidden", name="wip", value="1" )
+                button( type="submit" ) Great, we have a Frontend-Dude
 
   if user
 

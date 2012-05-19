@@ -257,6 +257,53 @@ app.post
   }
 );
 
+app.put
+(
+  '/:project_id',
+  function( request, response )
+  {
+    var project_id = request.params.project_id;
+
+    redis.sismember
+    (
+      'projects:list', project_id,
+      function( err, result )
+      {
+        if( !result )
+        {
+          response.send( 'Sorry, we have no Project "' + project_id + '"?', 404 );
+        }
+
+        redis.get
+        (
+          'projects:data:' + project_id,
+          function( err, project )
+          {
+            project = JSON.parse( project );
+            project.wip = !!parseInt( request.body.wip, 10 );
+
+            redis.set
+            (
+              'projects:data:' + project_id,
+              JSON.stringify( project )
+            );
+
+            if( request.xhr ) {
+
+              response.send( 'OK', 200 );
+
+            } else {
+
+              response.redirect( '/' );
+
+            }
+          }
+        );
+      }
+    );
+  }
+);
+
 app.get
 (
   '/auth',
