@@ -24,7 +24,8 @@ block content
             if project._score
               strong #{project._score}*
 
-          p= project.description
+          p Suggested: #{project.created_at}
+          p Description: #{project.description}
 
           if project.picture
             img( src="http://src.sencha.io/100/100/" + project.picture )
